@@ -36,6 +36,7 @@ HOME_REDIRECT_TO = env('APP_HOME_REDIRECT_TO')
 
 INSTALLED_APPS = [
     'users',
+    'hits',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
