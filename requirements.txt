@@ -1,0 +1,9 @@
+Django>=3.0,<4.0
+django-environ==0.4.5
+django-json-widget==1.0.1
+djangorestframework==3.12.2
+django-cors-headers==3.5.0
+gunicorn==20.0.4
+psycopg2-binary>=2.8
+django_pagedown>=2.2.0
+django-redis>=4.12
