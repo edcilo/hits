@@ -7,7 +7,7 @@
 Change `composeexample` for the name of your project
 
 ```
-docker-compose run edc_django django-admin startproject composeexample .
+docker-compose run hits_django django-admin startproject composeexample .
 ```
 
 ## Configure the database in the new project

@@ -21,6 +21,7 @@ services:
         build: .
         volumes:
             - ./docker/hits/static:/code/static
+            - .:/code
         depends_on:
             - hits_psql
         env_file:

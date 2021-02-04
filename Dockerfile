@@ -17,6 +17,8 @@ RUN mkdir /code
 WORKDIR /code
 
 COPY . /code/
+RUN pip install -r requirements.txt
+
 RUN chmod a+rx ./start.sh
 
 EXPOSE 8000
