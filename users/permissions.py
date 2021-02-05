@@ -10,20 +10,24 @@ class CanManageHits(BasePermission):
                 email=request.user,
                 user_type__in=[User.BIGBOSS, User.MANAGER]
             )
-            hitman = User.objects.get(pk=request.data['hitman'])
-
-            if hitman.pk == user.pk:
-                return False
-
-            if user.is_bigboss():
-                return True
-            elif user.is_manager() and hitman.user_type == User.HITMAN:
-                return True
-            else:
-                return False
+            hitman = User.objects.get(
+                pk=request.data['hitman'],
+                is_active=True
+            )
         except User.DoesNotExist:
             return False
-        return True
+
+        if hitman.pk == user.pk:
+            return False
+
+        if user.is_bigboss():
+            return True
+        elif user.is_manager() \
+            and hitman.user_type == User.HITMAN \
+            and hitman.manager.pk == user.pk:
+            return True
+
+        return False
 
 
 class CanRegisterUser(BasePermission):
