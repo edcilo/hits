@@ -12,6 +12,7 @@ from hits.serializers import (HitModelSerializer, HitSerializer)
 # Create your views here.
 class HitViewSet(
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
@@ -46,6 +47,25 @@ class HitViewSet(
             "manager": manager,
         }
         return Response(data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        user = self.request.user
+
+        try:
+            hit_id = request.resolver_match.kwargs.get('pk')
+
+            if user.is_bigboss():
+                hit = Hit.objects.get(pk=hit_id)
+            elif user.is_manager():
+                hit = Hit.objects.get(pk=hit_id, manager=user)
+            elif user.is_hitman():
+                hit = Hit.objects.get(pk=hit_id, hitman=user)
+        except Hit.DoesNotExist:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
+
+        hit = HitModelSerializer(hit).data
+
+        return Response(hit, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         queryset = Hit.objects.filter(manager=self.request.user)
