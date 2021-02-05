@@ -20,7 +20,11 @@ class HitViewSet(
     serializer_class = HitModelSerializer
 
     def get_permissions(self):
-        permission_classes = [IsAuthenticated, CanManageHits]
+        permission_classes = [IsAuthenticated]
+
+        if self.action == 'create':
+            permission_classes.append(CanManageHits)
+
         return [permission() for permission in permission_classes]
 
     def create(self, request, *args, **kwargs):
