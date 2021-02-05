@@ -9,7 +9,17 @@ from users.models import User
 
 User = get_user_model()
 
+class ManagerModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email'
+        )
+
+
 class UserModelSerializer(serializers.ModelSerializer):
+    manager = ManagerModelSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -17,6 +27,7 @@ class UserModelSerializer(serializers.ModelSerializer):
             'username',
             'email',
             'user_type',
+            'manager',
         )
 
 
