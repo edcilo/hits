@@ -3,8 +3,9 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from users.serializers import UserLoginSerializer, UserModelSerializer
+from users.serializers import UserLoginSerializer, UserModelSerializer, UserSignUpSerializer
 from users.models import User
+
 
 # Create your views here.
 class UserViewSet(viewsets.GenericViewSet):
@@ -12,10 +13,8 @@ class UserViewSet(viewsets.GenericViewSet):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserModelSerializer
 
-    # Detail define si es una petición de detalle o no, en methods añadimos el método permitido, en nuestro caso solo vamos a permitir post
     @action(detail=False, methods=['post'])
     def login(self, request):
-        """User sign in."""
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
@@ -23,4 +22,12 @@ class UserViewSet(viewsets.GenericViewSet):
             'user': UserModelSerializer(user).data,
             'access_token': token
         }
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def signup(self, request):
+        serializer = UserSignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        data = UserModelSerializer(user).data
         return Response(data, status=status.HTTP_201_CREATED)
