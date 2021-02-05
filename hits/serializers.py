@@ -13,7 +13,9 @@ class HitModelSerializer(serializers.ModelSerializer):
         model = Hit
         fields = (
             'pk',
+            'target',
             'description',
+            'status',
             'created_at',
             'last_modified',
             'hitman',
@@ -22,6 +24,7 @@ class HitModelSerializer(serializers.ModelSerializer):
 
 class HitSerializer(serializers.Serializer):
     description = serializers.CharField(max_length=10000)
+    target = serializers.CharField(max_length=255)
     hitman = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     manager = serializers.HiddenField(default=serializers.CurrentUserDefault())
 

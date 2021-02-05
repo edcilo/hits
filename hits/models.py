@@ -21,6 +21,7 @@ class Hit(models.Model):
         choices=STATUS_TYPES,
         default=OPEN,
     )
+    target = models.CharField(max_length=255)
     description = RichTextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now_add=True)
