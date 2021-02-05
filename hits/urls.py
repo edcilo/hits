@@ -7,5 +7,6 @@ router = DefaultRouter()
 router.register(r'hits', views.HitViewSet, basename='hits')
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('hits/<int:pk>/change-status/', views.HitViewSet.as_view({"put": "change_status"}, name='change_status')),
+    path('', include(router.urls)),
 ]

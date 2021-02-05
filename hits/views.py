@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from users.permissions import IsBigbossUser, CanManageHits
+from users.permissions import IsBigbossUser
+from hits.permissions import CanManageHits, CanChangeHitStatus
 
 from hits.models import Hit
-from hits.serializers import (HitModelSerializer, HitSerializer)
+from hits.serializers import (HitModelSerializer, HitSerializer, HitChangeStatusSerializer)
 
 
 # Create your views here.
@@ -20,11 +22,17 @@ class HitViewSet(
 
     serializer_class = HitModelSerializer
 
+    def get_queryset(self):
+        queryset = Hit.objects.filter(manager=self.request.user)
+        return queryset
+
     def get_permissions(self):
         permission_classes = [IsAuthenticated]
 
         if self.action == 'create':
             permission_classes.append(CanManageHits)
+        if self.name == 'change_status':
+            permission_classes.append(CanChangeHitStatus)
 
         return [permission() for permission in permission_classes]
 
@@ -67,6 +75,11 @@ class HitViewSet(
 
         return Response(hit, status=status.HTTP_200_OK)
 
-    def get_queryset(self):
-        queryset = Hit.objects.filter(manager=self.request.user)
-        return queryset
+    @action(detail=True, methods=['put'], name='change_status')
+    def change_status(self, request, pk=None):
+        hit = Hit.objects.get(pk=pk)
+        serializer = HitChangeStatusSerializer(hit, request.data)
+        serializer.is_valid(raise_exception=True)
+        hit = serializer.save()
+        data = HitModelSerializer(hit).data
+        return Response(data, status=status.HTTP_200_OK)

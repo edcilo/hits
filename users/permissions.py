@@ -3,33 +3,6 @@ from rest_framework.permissions import BasePermission
 from users.models import User
 
 
-class CanManageHits(BasePermission):
-    def has_permission(self, request, view):
-        try:
-            user = User.objects.get(
-                email=request.user,
-                user_type__in=[User.BIGBOSS, User.MANAGER]
-            )
-            hitman = User.objects.get(
-                pk=request.data['hitman'],
-                is_active=True
-            )
-        except User.DoesNotExist:
-            return False
-
-        if hitman.pk == user.pk:
-            return False
-
-        if user.is_bigboss():
-            return True
-        elif user.is_manager() \
-            and hitman.user_type == User.HITMAN \
-            and hitman.manager.pk == user.pk:
-            return True
-
-        return False
-
-
 class CanRegisterUser(BasePermission):
     def has_permission(self, request, view):
         user_type = request.data['user_type']

@@ -22,6 +22,7 @@ class HitModelSerializer(serializers.ModelSerializer):
             'manager',
         )
 
+
 class HitSerializer(serializers.Serializer):
     description = serializers.CharField(max_length=10000)
     target = serializers.CharField(max_length=255)
@@ -31,3 +32,12 @@ class HitSerializer(serializers.Serializer):
     def create(self, data):
         hit = Hit.objects.create(**data)
         return hit
+
+
+class HitChangeStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=Hit.STATUS_TYPES)
+
+    def update(self, instance, data):
+        instance.status = data['status']
+        instance.save()
+        return instance
