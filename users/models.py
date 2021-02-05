@@ -22,10 +22,23 @@ class User(AbstractUser):
     )
 
     def is_bigboss(self):
-        return this.user_type is self.BIGBOSS
+        return self.user_type in {self.BIGBOSS,}
 
     def is_manager(self):
-        return this.user_type is self.MANAGER
+        return self.user_type in {self.MANAGER,}
 
     def is_hitman(self):
-        return this.user_type is self.HITMAN
+        return self.user_type in {self.HITMAN,}
+
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.user_type = self.BIGBOSS
+
+        if not self.is_superuser and self.user_type == self.BIGBOSS:
+            self.user_type = self.HITMAN
+
+        super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        if not self.is_bigboss():
+            super(User, self).delete(using, keep_parents)
