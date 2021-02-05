@@ -26,6 +26,5 @@ class HitSerializer(serializers.Serializer):
     manager = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     def create(self, data):
-        # TODO: add validations
         hit = Hit.objects.create(**data)
         return hit

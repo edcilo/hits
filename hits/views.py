@@ -34,6 +34,19 @@ class HitViewSet(
         data = HitModelSerializer(hit).data
         return Response(data, status=status.HTTP_201_CREATED)
 
+    def list(self, request, *args, **kwargs):
+        manager = Hit.objects.all() if self.request.user.is_bigboss() else Hit.objects.filter(manager=self.request.user)
+        assigned = Hit.objects.filter(hitman=self.request.user)
+
+        manager = HitModelSerializer(manager, many=True).data
+        assigned = HitModelSerializer(assigned, many=True).data
+
+        data = {
+            "assigned": assigned,
+            "manager": manager,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
     def get_queryset(self):
         queryset = Hit.objects.filter(manager=self.request.user)
         return queryset
