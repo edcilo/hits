@@ -21,7 +21,8 @@ class Hit(models.Model):
         choices=STATUS_TYPES,
         default=OPEN,
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = RichTextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now_add=True)
+    hitman = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hit_assigned')
+    manager = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hit_created')
