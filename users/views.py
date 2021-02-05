@@ -4,14 +4,13 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from users.permissions import CanRegisterUser
-from users.serializers import UserLoginSerializer, UserModelSerializer, UserSignUpSerializer
+from users.permissions import CanRegisterUser, CanDeactivateUser
+from users.serializers import UserLoginSerializer, UserModelSerializer, UserSignUpSerializer, UserDeactiveSerializer
 from users.models import User
 
 
 # Create your views here.
 class UserViewSet(viewsets.GenericViewSet):
-
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserModelSerializer
 
@@ -22,6 +21,8 @@ class UserViewSet(viewsets.GenericViewSet):
             permission_classes = [IsAuthenticated, CanRegisterUser]
         elif self.name == 'logout':
             permission_classes = [IsAuthenticated]
+        elif self.name == 'deactive':
+            permission_classes = [IsAuthenticated, CanDeactivateUser]
 
         return [permission() for permission in permission_classes]
 
@@ -49,3 +50,12 @@ class UserViewSet(viewsets.GenericViewSet):
     def logout(self, request):
         request.user.auth_token.delete()
         return Response(status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['delete'], name='deactive')
+    def deactive(self, request, pk=None):
+        user = User.objects.get(pk=pk)
+        serializer = UserDeactiveSerializer(user, request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        data = UserModelSerializer(user).data
+        return Response(data, status=status.HTTP_200_OK)

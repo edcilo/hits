@@ -81,3 +81,10 @@ class UserSignUpSerializer(serializers.Serializer):
         data.pop('password_confirmation')
         user = User.objects.create_user(**data)
         return user
+
+
+class UserDeactiveSerializer(serializers.Serializer):
+    def update(self, instance, data):
+        instance.is_active = False
+        instance.save()
+        return instance
