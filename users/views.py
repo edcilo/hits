@@ -14,6 +14,14 @@ class UserViewSet(viewsets.GenericViewSet):
     serializer_class = UserModelSerializer
 
     @action(detail=False, methods=['post'])
+    def signup(self, request):
+        serializer = UserSignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        data = UserModelSerializer(user).data
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
     def login(self, request):
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -24,10 +32,9 @@ class UserViewSet(viewsets.GenericViewSet):
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
+    # TODO: fix logout
     @action(detail=False, methods=['post'])
-    def signup(self, request):
-        serializer = UserSignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        data = UserModelSerializer(user).data
-        return Response(data, status=status.HTTP_201_CREATED)
+    def logout(self, request):
+        print(request.user)
+        #request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
