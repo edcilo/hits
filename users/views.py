@@ -23,6 +23,8 @@ class UserViewSet(viewsets.GenericViewSet):
             permission_classes = [IsAuthenticated]
         elif self.name == 'deactive':
             permission_classes = [IsAuthenticated, CanDeactivateUser]
+        elif self.name == 'hitmen' or self.name == 'detail':
+            permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
 
@@ -59,3 +61,37 @@ class UserViewSet(viewsets.GenericViewSet):
         user = serializer.save()
         data = UserModelSerializer(user).data
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], name='hitmen')
+    def hitmen(self, request):
+        user = self.request.user
+
+        if user.is_bigboss():
+            users = User.objects.exclude(pk=user.pk)
+        elif user.is_manager():
+            users = User.objects.filter(manager=user)
+        else:
+            return Response(None, status=status.HTTP_403_FORBIDDEN)
+
+        users = UserModelSerializer(users, many=True).data
+
+        return Response(users, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'], name='detail')
+    def hitman(self, request, pk=None):
+        user = self.request.user
+
+        try:
+            if user.is_bigboss():
+                hitman = User.objects.get(pk=pk)
+            elif user.is_manager():
+                hitman = User.objects.get(pk=pk, manager=user)
+            elif user.is_hitman() and user.pk == pk:
+                hitman = User.objects.get(pk=pk)
+            else:
+                return Response(None, status=status.HTTP_403_FORBIDDEN)
+        except User.DoesNotExist:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
+
+        hitman = UserModelSerializer(user).data
+        return Response(hitman, status=status.HTTP_200_OK)
