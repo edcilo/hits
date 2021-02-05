@@ -21,20 +21,14 @@ class UserModelSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-
-    # Campos que vamos a requerir
     email = serializers.EmailField(max_length=150)
     password = serializers.CharField(min_length=6, max_length=64)
 
-    # Primero validamos los datos
     def validate(self, data):
-
-        # authenticate recibe las credenciales, si son válidas devuelve el objeto del usuario
         user = authenticate(username=data['email'], password=data['password'])
         if not user:
             raise serializers.ValidationError('Las credenciales no son válidas')
 
-        # Guardamos el usuario en el contexto para posteriormente en create recuperar el token
         self.context['user'] = user
         return data
 
@@ -56,6 +50,7 @@ class UserSignUpSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8, max_length=64)
     password_confirmation = serializers.CharField(min_length=8, max_length=64)
     user_type = serializers.ChoiceField(choices=User.USER_TYPES)
+    manager = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     def validate(self, data):
         passwd = data['password']

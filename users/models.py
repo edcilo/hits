@@ -24,6 +24,7 @@ class User(AbstractUser):
         choices=USER_TYPES,
         default=HITMAN,
     )
+    manager = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
 
     def is_bigboss(self):
         return self.user_type in {self.BIGBOSS,}

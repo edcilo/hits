@@ -28,7 +28,7 @@ class UserViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['post'], name='register')
     def register(self, request):
         user = request.user
-        serializer = UserSignUpSerializer(data=request.data)
+        serializer = UserSignUpSerializer(data=request.data, context={"request": self.request})
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = UserModelSerializer(user).data
