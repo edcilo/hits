@@ -46,7 +46,7 @@ class UserViewSet(viewsets.GenericViewSet):
             'user': UserModelSerializer(user).data,
             'access_token': token
         }
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], name='logout')
     def logout(self, request):
